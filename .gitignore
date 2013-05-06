@@ -1,2 +1,15 @@
 #NetBeans project folder
 nbproject/
+
+
+#Cliquer file
+cliquer.c
+cliquer.h
+cliquerconf.h
+graph.c
+graph.h
+misc.h
+reorder.c
+reorder.h
+set.h
+
