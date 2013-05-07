@@ -56,8 +56,6 @@ void processGraph(graph_t *g){
     
     fprintf(stdout, "%d, %d, %d, %d, %d, %d\n", graphCount, g->n, alpha, independentSetCount, set_size(core), g->n - set_size(anticore));
     
-    if(alpha != g->n/2) return;
-    
     independentSetCounts = increment(independentSetCounts, independentSetCount);
     
     if(independentSetCount == 1){
