@@ -79,6 +79,9 @@ void processGraph(graph_t *g){
         int upper1 = independentSetCount - 1;
         int upper2 = alpha - set_size(core);
         int upperBound = upper1 < upper2 ? upper1 : upper2;
+        
+        temporarySet = set_new(g->n);
+        
         for(i=0; i<independentSetCount; i++){
             int f = forcingNumberForIndependentSet(i, upperBound);
             if(f!=-1 && (forcingNumber==-1 || f < forcingNumber)){
@@ -89,6 +92,8 @@ void processGraph(graph_t *g){
                 }
             }
         }
+        
+        set_free(temporarySet);
     }
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
@@ -103,7 +108,7 @@ int forcingNumberForIndependentSet(int setNr, int upperBound){
     //first check to see whether the forcing number is 1
     int i;
     for(i=setNr+1; i<independentSetCount; i++){
-        if(set_size(set_intersection(NULL, independentSets[setNr], independentSets[i]))>0){
+        if(set_size(set_intersection(temporarySet, independentSets[setNr], independentSets[i]))>0){
             return 1;
         }
     }

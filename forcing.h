@@ -45,6 +45,10 @@ int independentSetCount;
 int alpha;
 int forcingNumber;
 
+// reserved variables for some methods
+
+set_t temporarySet; // used by forcingNumberForIndependentSet
+
 // Methods
 
 boolean handleClique(set_t s, graph_t *g, clique_options *opt);
