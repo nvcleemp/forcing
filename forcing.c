@@ -93,9 +93,6 @@ graph_t *getComplement(graph_t *g){
 // Printing methods
 //===================================================================
 
-void printSet(set_t s, graph_t *g, clique_options *opt){
-    set_print(s);
-}
 
 //===================================================================
 // Input methods
