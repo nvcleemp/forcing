@@ -1,6 +1,13 @@
 #
 # Makefile for forcing
 #
+#
+# Main developer: Nico Van Cleemput
+# In collaboration with: Craig Larson
+# 
+# Copyright (C) 2013 Ghent University.
+# Licensed under the GNU GPL, read the file LICENSE.txt for details.
+#
 
 SHELL = /bin/sh
 

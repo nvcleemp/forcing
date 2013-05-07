@@ -1,8 +1,9 @@
-/* 
- * File:   freqtable.h
- * Author: nvcleemp
- *
- * Created on May 6, 2013, 7:51 PM
+/*
+ * Main developer: Nico Van Cleemput
+ * In collaboration with: Craig Larson
+ * 
+ * Copyright (C) 2013 Ghent University.
+ * Licensed under the GNU GPL, read the file LICENSE.txt for details.
  */
 
 #ifndef FREQTABLE_H

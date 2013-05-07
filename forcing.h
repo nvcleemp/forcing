@@ -1,8 +1,9 @@
-/* 
- * File:   forcing.h
- * Author: nvcleemp
- *
- * Created on May 7, 2013, 9:26 AM
+/*
+ * Main developer: Nico Van Cleemput
+ * In collaboration with: Craig Larson
+ * 
+ * Copyright (C) 2013 Ghent University.
+ * Licensed under the GNU GPL, read the file LICENSE.txt for details.
  */
 
 #ifndef FORCING_H
