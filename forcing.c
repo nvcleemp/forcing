@@ -79,12 +79,38 @@ void processGraph(graph_t *g){
         int upper1 = independentSetCount - 1;
         int upper2 = alpha - set_size(core);
         int upperBound = upper1 < upper2 ? upper1 : upper2;
+        for(i=0; i<independentSetCount; i++){
+            int f = forcingNumberForIndependentSet(i, upperBound);
+            if(f!=-1 && (forcingNumber==-1 || f < forcingNumber)){
+                forcingNumber = f;
+                upperBound = f; //f is at most upperBound
+                if(forcingNumber == lowerBound){
+                    break;
+                }
+            }
+        }
     }
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
     
     set_free(core);
     set_free(anticore);
+}
+
+int forcingNumberForIndependentSet(int setNr, int upperBound){
+    //if no forcing set with size smaller than upperBound is found, return -1
+    
+    //first check to see whether the forcing number is 1
+    int i;
+    for(i=setNr+1; i<independentSetCount; i++){
+        if(set_size(set_intersection(NULL, independentSets[setNr], independentSets[i]))>0){
+            return 1;
+        }
+    }
+    
+    //calculate force number using a brute-force technique
+    
+    return -1;
 }
 
 //===================================================================

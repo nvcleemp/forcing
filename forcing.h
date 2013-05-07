@@ -51,6 +51,8 @@ boolean handleClique(set_t s, graph_t *g, clique_options *opt);
 
 void processGraph(graph_t *g);
 
+int forcingNumberForIndependentSet(int setNr, int upperBound);
+
 graph_t *getComplement(graph_t *g);
 
 boolean readPlanarCode(FILE *f, graph_t **g);
