@@ -4,6 +4,11 @@ nbproject/
 #Executable file
 forcing
 
+#source distributions
+forcing-sources.tar.gz
+forcing-sources.zip
+
+
 #Cliquer file
 cliquer.c
 cliquer.h
