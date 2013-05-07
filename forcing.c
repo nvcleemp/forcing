@@ -107,15 +107,35 @@ int forcingNumberForIndependentSet(int setNr, int upperBound){
     
     //first check to see whether the forcing number is 1
     int i;
-    for(i=setNr+1; i<independentSetCount; i++){
-        if(set_size(set_intersection(temporarySet, independentSets[setNr], independentSets[i]))>0){
-            return 1;
-        }
+    set_t setAntiCore = set_duplicate(independentSets[setNr]);
+    for(i=0; i<independentSetCount; i++){
+        if(i==setNr) continue;
+        
+        set_t oldSetAntiCore = setAntiCore;
+        set_t complement = getSetComplement(independentSets[i]);
+        setAntiCore = set_intersection(NULL, oldSetAntiCore, complement);
+        set_free(oldSetAntiCore);
+        set_free(complement);
     }
+    if(set_size(setAntiCore)>0){
+        return 1;
+    }
+    set_free(setAntiCore);
     
     //calculate force number using a brute-force technique
     
     return -1;
+}
+
+set_t getSetComplement(set_t s){
+    int i;
+    set_t sComplement = set_new(set_size(s));
+    for(i = 0; i < set_size(s); i++){
+        if(!SET_CONTAINS_FAST(s, i)){
+            SET_ADD_ELEMENT(sComplement, i);
+        }
+    }
+    return sComplement;
 }
 
 //===================================================================

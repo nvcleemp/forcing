@@ -57,6 +57,8 @@ void processGraph(graph_t *g);
 
 int forcingNumberForIndependentSet(int setNr, int upperBound);
 
+set_t getSetComplement(set_t s);
+
 graph_t *getComplement(graph_t *g);
 
 boolean readPlanarCode(FILE *f, graph_t **g);
