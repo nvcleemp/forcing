@@ -62,6 +62,9 @@ void processGraph(graph_t *g){
         forcingNumber = 0;
     } else if(independentSetCount == 2){
         forcingNumber = 1;
+    } else {
+        int lowerBound = 1;
+        int upperBound = independentSetCount - 1 < alpha ? independentSetCount - 1 : alpha;
     }
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
