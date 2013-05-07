@@ -2,26 +2,11 @@
 #include <stdio.h>
 #include <getopt.h>
 #include "cliquer.h"
-#include "freqtable.h"
-
-int graphCount;
-
-freqtable forcingNumberCount = NULL;
-
-freqtable independentSetCounts = NULL;
-
-int onlyGraph = 0;
-int detailed = FALSE;
+#include "forcing.h"
 
 //===================================================================
 // Forcing independence methods
 //===================================================================
-
-set_t core;
-set_t anticore;
-int independentSetCount;
-int alpha;
-int forcingNumber;
 
 
 boolean handleClique(set_t s,graph_t *g,clique_options *opt){
