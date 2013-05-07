@@ -24,6 +24,11 @@ boolean handleClique(set_t s,graph_t *g,clique_options *opt){
         //use the first independent set to determine the value of alpha
         alpha = set_size(s);
     }
+    if(independentSetCount >= MAXIMUM_CLIQUE_COUNT){
+        fprintf(stderr, "Not prepared to handle that many independent sets.\n");
+        fprintf(stderr, "Recompile the program with a larger value for MAXIMUM_CLIQUE_COUNT.\n");
+        exit(EXIT_FAILURE);
+    }
     independentSetCount++;
     
     set_t oldCore = core;
@@ -46,8 +51,8 @@ void processGraph(graph_t *g){
     opts->reorder_map=NULL;
     opts->user_function=handleClique;
     opts->user_data=NULL;
-    opts->clique_list=NULL;
-    opts->clique_list_length=0;
+    opts->clique_list=independentSets;
+    opts->clique_list_length=MAXIMUM_CLIQUE_COUNT;
     
     core = set_new(g->n);
     anticore = set_new(g->n);

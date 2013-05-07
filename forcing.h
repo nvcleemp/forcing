@@ -9,6 +9,10 @@
 #ifndef FORCING_H
 #define	FORCING_H
 
+#ifndef MAXIMUM_CLIQUE_COUNT
+#define MAXIMUM_CLIQUE_COUNT 200
+#endif
+
 #include "freqtable.h"
 #include <stddef.h>
 #include "misc.h"
@@ -19,6 +23,11 @@ extern "C" {
 
 // Variables which store data during the whole run of the program
 int graphCount;
+
+set_t independentSets[MAXIMUM_CLIQUE_COUNT];
+//TODO: allow the user to set a value when calling the program
+//TODO: calculate an upper bound in some cases
+//      (The general upper bound is sharp, but way too big to always be used.)
 
 freqtable forcingNumberCount = NULL;
 
