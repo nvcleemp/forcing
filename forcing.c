@@ -246,6 +246,8 @@ void help(char *name){
     fprintf(stderr, "       Only do the calculations for the nth graph in the input.\n");
     fprintf(stderr, "    -d, --detailed\n");
     fprintf(stderr, "       Print various details during the calculations.\n");
+    fprintf(stderr, "    -v, --verbose\n");
+    fprintf(stderr, "       Make the program more verbose.\n");
 }
 
 void usage(char *name){
@@ -262,11 +264,12 @@ boolean processOptions(int argc, char **argv) {
     static struct option long_options[] = {
         {"help", no_argument, NULL, 'h'},
         {"filter", required_argument, NULL, 'f'},
-        {"detailed", no_argument, NULL, 'd'}
+        {"detailed", no_argument, NULL, 'd'},
+        {"verbose", no_argument, NULL, 'v'}
     };
     int option_index = 0;
 
-    while ((c = getopt_long(argc, argv, "hf:d", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "hf:dv", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 //handle long option with no alternative
@@ -285,6 +288,9 @@ boolean processOptions(int argc, char **argv) {
                 break;
             case 'd':
                 detailed = TRUE;
+                break;
+            case 'v':
+                verbose = TRUE;
                 break;
             case '?':
                 usage(name);
@@ -313,7 +319,7 @@ int main(int argc, char *argv[]) {
         //filtering
         if(onlyGraph && graphCount != onlyGraph) continue;
         
-        ASSERT(graph_test(g,stderr));
+        ASSERT(graph_test(g,(verbose ? stderr : NULL)));
         gComplement = getComplement(g);
         
         if(detailed) graph_print(g);

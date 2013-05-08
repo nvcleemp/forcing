@@ -36,6 +36,7 @@ freqtable independentSetCounts = NULL;
 // Flags which are set at the beginning of the program
 int onlyGraph = 0;
 int detailed = FALSE;
+boolean verbose = FALSE;
 
 // Variables which store data for a single graph
 
