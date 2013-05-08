@@ -172,14 +172,27 @@ boolean readPlanarCode(FILE *f, graph_t **g){
     if (first) {
         first = 0;
 
-        if (fread(&testheader, sizeof (unsigned char), 15, f) != 15) {
+        if (fread(&testheader, sizeof (unsigned char), 13, f) != 13) {
             fprintf(stderr, "can't read header ((1)file too small)-- exiting\n");
             exit(1);
         }
-        testheader[15] = 0;
-        if (strcmp(testheader, ">>planar_code<<") != 0) {
+        testheader[13] = 0;
+        if (strcmp(testheader, ">>planar_code") != 0) {
             fprintf(stderr, "No planarcode header detected -- exiting!\n");
             exit(1);
+        }
+        //read reminder of header (either empty or le/be specification)
+        if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            return FALSE;
+        }
+        while (c!='<'){
+            if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+                return FALSE;
+            }
+        }
+        //read one more character
+        if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            return FALSE;
         }
     }
 
