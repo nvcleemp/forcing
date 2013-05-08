@@ -66,8 +66,6 @@ void processGraph(graph_t *g){
     
     clique_find_all(g,0,0,TRUE,opts);
     
-    fprintf(stdout, "%d, %d, %d, %d, %d, %d\n", graphCount, g->n, alpha, independentSetCount, set_size(core), g->n - set_size(anticore));
-    
     independentSetCounts = increment(independentSetCounts, independentSetCount);
     
     if(independentSetCount == 1){
@@ -95,6 +93,8 @@ void processGraph(graph_t *g){
         
         set_free(temporarySet);
     }
+    
+    fprintf(stdout, "%d, %d, %d, %d, %d, %d, %d\n", graphCount, g->n, alpha, independentSetCount, set_size(core), g->n - set_size(anticore), forcingNumber);
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
     
