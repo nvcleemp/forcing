@@ -363,7 +363,7 @@ void usage(char *name){
 /*
  * process any command-line options.
  */
-boolean processOptions(int argc, char **argv) {
+int processOptions(int argc, char **argv) {
     int c;
     char *name = argv[0];
     static struct option long_options[] = {
@@ -410,7 +410,7 @@ boolean processOptions(int argc, char **argv) {
                 return EXIT_FAILURE;
         }
     }
-    return EXIT_SUCCESS;
+    return -1;
 }
 
 int main(int argc, char *argv[]) {
@@ -418,7 +418,8 @@ int main(int argc, char *argv[]) {
     graph_t *gComplement;
 //    set_t s;
     
-    if(processOptions(argc, argv)==EXIT_FAILURE) return EXIT_FAILURE;
+    int po = processOptions(argc, argv);
+    if(po != -1) return po;
     
     graphCount = 0;
     
