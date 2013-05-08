@@ -33,10 +33,11 @@ freqtable forcingNumberCount = NULL;
 
 freqtable independentSetCounts = NULL;
 
-// Flags which are set at the beginning of the program
+// Flags and variables which are set at the beginning of the program
 int onlyGraph = 0;
 int detailed = FALSE;
 boolean verbose = FALSE;
+FILE *outfile = NULL;
 
 // Variables which store data for a single graph
 

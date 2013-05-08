@@ -94,7 +94,9 @@ void processGraph(graph_t *g){
         set_free(temporarySet);
     }
     
-    fprintf(stdout, "%d, %d, %d, %d, %d, %d, %d\n", graphCount, g->n, alpha, independentSetCount, set_size(core), g->n - set_size(anticore), forcingNumber);
+    if(outfile!=NULL){
+        fprintf(outfile, "%d, %d, %d, %d, %d, %d, %d\n", graphCount, g->n, alpha, independentSetCount, set_size(core), g->n - set_size(anticore), forcingNumber);
+    }
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
     
@@ -341,6 +343,16 @@ void help(char *name){
     fprintf(stderr, "       Print various details during the calculations.\n");
     fprintf(stderr, "    -v, --verbose\n");
     fprintf(stderr, "       Make the program more verbose.\n");
+    fprintf(stderr, "    -o, --output\n");
+    fprintf(stderr, "       Write output to stdout. The output consists of comma-separated lists.\n");
+    fprintf(stderr, "       This list contains the following items:\n");
+    fprintf(stderr, "           * number of the graph\n");
+    fprintf(stderr, "           * number of vertices in the graph\n");
+    fprintf(stderr, "           * independence number of the graph\n");
+    fprintf(stderr, "           * number of maximum independent sets in the graph\n");
+    fprintf(stderr, "           * the size of the core of the graph\n");
+    fprintf(stderr, "           * the size of the anti-core of the graph\n");
+    fprintf(stderr, "           * the forcing number of the graph\n");
 }
 
 void usage(char *name){
@@ -358,11 +370,12 @@ boolean processOptions(int argc, char **argv) {
         {"help", no_argument, NULL, 'h'},
         {"filter", required_argument, NULL, 'f'},
         {"detailed", no_argument, NULL, 'd'},
-        {"verbose", no_argument, NULL, 'v'}
+        {"verbose", no_argument, NULL, 'v'},
+        {"output", no_argument, NULL, 'o'}
     };
     int option_index = 0;
 
-    while ((c = getopt_long(argc, argv, "hf:dv", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "hf:dvo", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 //handle long option with no alternative
@@ -384,6 +397,9 @@ boolean processOptions(int argc, char **argv) {
                 break;
             case 'v':
                 verbose = TRUE;
+                break;
+            case 'o':
+                outfile = stdout;
                 break;
             case '?':
                 usage(name);
