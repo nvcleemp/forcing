@@ -240,6 +240,86 @@ boolean readPlanarCode(FILE *f, graph_t **g){
     return (1);
 }
 
+boolean readMultiCode(FILE *f, graph_t **g){
+    static int first = 1;
+    unsigned char c;
+    char testheader[20];
+    int zeroCounter;
+    
+    if (first) {
+        first = 0;
+
+        if (fread(&testheader, sizeof (unsigned char), 12, f) != 12) {
+            fprintf(stderr, "can't read header ((1)file too small)-- exiting\n");
+            exit(1);
+        }
+        testheader[12] = 0;
+        if (strcmp(testheader, ">>multi_code") != 0) {
+            fprintf(stderr, "No multicode header detected -- exiting!\n");
+            exit(1);
+        }
+        //read reminder of header (either empty or le/be specification)
+        if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            fprintf(stderr, "Unexpected EOF.\n");
+            exit(1);
+        }
+        while (c!='<'){
+            if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+                fprintf(stderr, "Unexpected EOF.\n");
+                exit(1);
+            }
+        }
+        //read one more character
+        if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            fprintf(stderr, "Unexpected EOF.\n");
+            exit(1);
+        }
+    }
+
+    if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+        //nothing left in file
+        return FALSE;
+    }
+
+    if (c != 0) /* unsigned chars would be sufficient */ {
+        int order = c;
+        *g = graph_new(order);
+        zeroCounter = 0;
+        while (zeroCounter < order) {
+            int neighbour = (unsigned short) getc(f);
+            if (neighbour == 0) {
+                zeroCounter++;
+            } else {
+                GRAPH_ADD_EDGE(*g, zeroCounter, neighbour-1);
+            }
+        }
+    } else {
+        int order = 0;
+        int readCount = fread(&order, sizeof (unsigned short), 1, f);
+        if(!readCount){
+            fprintf(stderr, "Unexpected EOF.\n");
+            exit(1);
+        }
+        *g = graph_new(order);
+        int neighbour = 0;
+        zeroCounter = 0;
+        while (zeroCounter < order) {
+            readCount = fread(&neighbour, sizeof (unsigned short), 1, f);
+            if(!readCount){
+                fprintf(stderr, "Unexpected EOF.\n");
+                exit(1);
+            }
+            if (neighbour == 0) {
+                zeroCounter++;
+            } else {
+                GRAPH_ADD_EDGE(*g, zeroCounter, neighbour-1);
+            }
+        }
+    }
+
+    return TRUE;
+}
+
 //===================================================================
 // Usage methods
 //===================================================================

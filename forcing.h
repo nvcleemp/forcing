@@ -64,6 +64,8 @@ graph_t *getComplement(graph_t *g);
 
 boolean readPlanarCode(FILE *f, graph_t **g);
 
+boolean readMultiCode(FILE *f, graph_t **g);
+
 void help(char *name);
 
 void usage(char *name);
