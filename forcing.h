@@ -57,7 +57,11 @@ boolean handleClique(set_t s, graph_t *g, clique_options *opt);
 
 void processGraph(graph_t *g);
 
-int forcingNumberForIndependentSet(int setNr, int upperBound);
+int forcingNumberForIndependentSet(int setNr, int upperBound, int n);
+
+boolean existsForcingSetOfSize(int iSet, int targetSize, int currentSize, int remainingVertices, int lastVertex, set_t forcingSet);
+
+static set_t set_difference(set_t res,set_t a,set_t b);
 
 set_t getSetComplement(set_t s);
 

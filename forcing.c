@@ -10,6 +10,7 @@
 #include <getopt.h>
 #include "cliquer.h"
 #include "forcing.h"
+#include "set.h"
 
 //===================================================================
 // Forcing independence methods
@@ -81,7 +82,7 @@ void processGraph(graph_t *g){
         temporarySet = set_new(g->n);
         
         for(i=0; i<independentSetCount; i++){
-            int f = forcingNumberForIndependentSet(i, upperBound);
+            int f = forcingNumberForIndependentSet(i, upperBound, g->n);
             if(f!=-1 && (forcingNumber==-1 || f < forcingNumber)){
                 forcingNumber = f;
                 upperBound = f; //f is at most upperBound
@@ -104,7 +105,7 @@ void processGraph(graph_t *g){
     set_free(anticore);
 }
 
-int forcingNumberForIndependentSet(int setNr, int upperBound){
+int forcingNumberForIndependentSet(int setNr, int upperBound, int n){
     //if no forcing set with size smaller than upperBound is found, return -1
     
     //first check to see whether the forcing number is 1
@@ -125,8 +126,86 @@ int forcingNumberForIndependentSet(int setNr, int upperBound){
     set_free(setAntiCore);
     
     //calculate force number using a brute-force technique
+    set_t forcingSet = set_new(n);
+    for (i = 2; i <= upperBound; i++) {
+        if (existsForcingSetOfSize(setNr, i, 0, alpha, -1, forcingSet)) {
+            set_free(forcingSet);
+            return i;
+        }
+    }
+    set_free(forcingSet);
     
     return -1;
+}
+
+boolean existsForcingSetOfSize(int iSet, int targetSize, int currentSize, int remainingVertices, int lastVertex, set_t forcingSet){
+    if (targetSize == currentSize) {
+        //check forcing
+        set_t diff;
+        int i;
+        for (i=0; i<independentSetCount; i++){
+            if (iSet!=i) {
+                diff = set_difference(NULL, forcingSet, independentSets[i]);
+                if (set_size(diff)==0){
+                    set_free(diff);
+                    return FALSE;
+                }
+                set_free(diff);
+            }
+        }
+        return TRUE;
+    } else if (remainingVertices + currentSize < targetSize) {
+        return FALSE;
+    } else {
+        //try extending the set
+        while (remainingVertices + currentSize >= targetSize) {
+            int next = set_return_next(independentSets[iSet], lastVertex);
+            
+            SET_ADD_ELEMENT((forcingSet), next);
+            remainingVertices--;
+            if(existsForcingSetOfSize(iSet, targetSize, currentSize+1, remainingVertices, next, forcingSet)){
+                return TRUE;
+            }
+            
+            SET_DEL_ELEMENT((forcingSet), next);
+            lastVertex = next;
+        }
+        return FALSE;
+    }
+}
+
+
+/*
+ * set_difference()
+ *
+ * Store the difference of sets a and b into res.  If res is NULL,
+ * a new set is created and the result is written to it.  If res is
+ * smaller than the larger one of a and b, it is freed and a new set
+ * is created and the result is returned.
+ *
+ * Returns either res or a new set that has been allocated in its stead.
+ *
+ * Note:  res may not be a or b.
+ */
+INLINE
+static set_t set_difference(set_t res,set_t a,set_t b) {
+	int i,max;
+
+	if (res==NULL) {
+		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+	} else if (SET_MAX_SIZE(res) < MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b))) {
+		set_free(res);
+		res = set_new(MAX(SET_MAX_SIZE(a),SET_MAX_SIZE(b)));
+	} else {
+		set_empty(res);
+	}
+
+	max=MIN(SET_ARRAY_LENGTH(a),SET_ARRAY_LENGTH(b));
+	for (i=0; i<max; i++) {
+		res[i]=SET_ELEMENT_DIFFERENCE(a[i],b[i]);
+	}
+
+	return res;
 }
 
 set_t getSetComplement(set_t s){
