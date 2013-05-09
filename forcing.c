@@ -401,6 +401,86 @@ boolean readMultiCode(FILE *f, graph_t **g){
     return TRUE;
 }
 
+boolean readGraph6(FILE *f, graph_t **g){
+    unsigned char c;
+    char testheader[10];
+    int order;
+    
+    c = getc(f);
+    
+    if (c == (unsigned char)EOF) {
+        //reached end of file
+        return FALSE;
+    }
+    
+    if (c == '>') {
+        //there must be a header
+        if (fread(&testheader, sizeof (unsigned char), 9, f) != 9) {
+            fprintf(stderr, "can't read header ((1)file too small)-- exiting\n");
+            exit(1);
+        }
+        testheader[9] = 0;
+        if (strcmp(testheader, ">graph6<<") != 0) {
+            fprintf(stderr, "No graph6 header detected -- exiting!\n");
+            fprintf(stderr, "Header found was >%s\n", testheader);
+            exit(1);
+        }
+    
+        if (fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            //nothing left in file
+            return FALSE;
+        }
+
+        if (c == '\n' && fread(&c, sizeof (unsigned char), 1, f) == 0) {
+            //skipped line feed after header and found nothing there :-(
+            return FALSE;
+        }
+    }
+    
+    if (c - 63 < 63) {
+        order = c - 63;
+    } else {
+        unsigned char c1, c2, c3;
+        c1 = getc(f) - 63;
+        c2 = getc(f) - 63;
+        c3 = getc(f) - 63;
+        order = (c1<<12) + (c2<<6) + c3;
+    }
+    
+    *g = graph_new(order);
+    
+    int i = 0, j = 1;
+    while(TRUE){
+        c = getc(f) - 63;
+        int d;
+        for (d = 5; d >= 0; d--) {
+            if ((c >> d) & 1) {
+                GRAPH_ADD_EDGE(*g, i, j);
+            }
+            //next position in adjacency matrix
+            i++;
+            if (i == j){
+                j++;
+                i = 0;
+            }
+            if (j == order) break; //reached end of adjacency matrix
+        }
+        if (j == order) break; //reached end of adjacency matrix
+    }
+    
+    //read end of line
+    if (fread(&c, sizeof (unsigned char), 1, f) == 1) {
+        //we didn't reach EOF
+        if (c != '\n') {
+            fprintf(stderr, "Unexpected character-- exiting\n");
+            fprintf(stderr, "Expected \\n, but found %c\n", c);
+            exit(1);
+        }
+    }
+
+    return TRUE;
+}
+
 //===================================================================
 // Usage methods
 //===================================================================
@@ -434,6 +514,7 @@ void help(char *name){
     fprintf(stderr, "       Specify the format of the input file. The possible values are:\n");
     fprintf(stderr, "           multi     multi_code\n");
     fprintf(stderr, "           planar    planar_code\n");
+    fprintf(stderr, "           g6        graph6\n");
     fprintf(stderr, "       In case this is not specified, the program assumes planar_code.\n");
 }
 
@@ -489,6 +570,8 @@ int processOptions(int argc, char **argv) {
                     readGraph = readMultiCode;
                 } else if (strcmp(optarg, "planar") == 0) {
                     readGraph = readPlanarCode;
+                } else if (strcmp(optarg, "g6") == 0) {
+                    readGraph = readGraph6;
                 } else {
                     fprintf(stderr, "Unknown file format: %s.\n", optarg);
                     return EXIT_FAILURE;
