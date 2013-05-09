@@ -201,8 +201,8 @@ static set_t set_difference(set_t res,set_t a,set_t b) {
 
 set_t getSetComplement(set_t s){
     int i;
-    set_t sComplement = set_new(set_size(s));
-    for(i = 0; i < set_size(s); i++){
+    set_t sComplement = set_new(SET_MAX_SIZE(s));
+    for(i = 0; i < SET_MAX_SIZE(s); i++){
         if(!SET_CONTAINS_FAST(s, i)){
             SET_ADD_ELEMENT(sComplement, i);
         }
