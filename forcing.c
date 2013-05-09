@@ -44,7 +44,7 @@ boolean handleClique(set_t s,graph_t *g,clique_options *opt){
 }
 
 void processGraph(graph_t *g){
-    clique_options opts = {NULL, NULL, NULL, stderr, handleClique, NULL, independentSets, MAXIMUM_CLIQUE_COUNT};
+    clique_options opts = {reorder_by_unweighted_greedy_coloring, NULL, NULL, stderr, handleClique, NULL, independentSets, MAXIMUM_CLIQUE_COUNT};
     
     core = set_new(g->n);
     anticore = set_new(g->n);
