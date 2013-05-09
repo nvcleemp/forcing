@@ -39,6 +39,8 @@ int detailed = FALSE;
 boolean verbose = FALSE;
 FILE *outfile = NULL;
 
+boolean (*readGraph) (FILE *f, graph_t **g);
+
 // Variables which store data for a single graph
 
 set_t core;

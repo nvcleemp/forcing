@@ -410,8 +410,6 @@ void help(char *name){
     fprintf(stderr, " %s [options]\n", name);
     fprintf(stderr, "       Calculate the forcing number for any graph read through stdin.\n");
     fprintf(stderr, "\n\n");
-    fprintf(stderr, "Currently only graphs in planarcode format are supported.");
-    fprintf(stderr, "\n\n");
     fprintf(stderr, "Valid options\n=============\n");
     fprintf(stderr, "* Various options\n");
     fprintf(stderr, "    -h, --help\n");
@@ -432,6 +430,11 @@ void help(char *name){
     fprintf(stderr, "           * the size of the core of the graph\n");
     fprintf(stderr, "           * the size of the anti-core of the graph\n");
     fprintf(stderr, "           * the forcing number of the graph\n");
+    fprintf(stderr, "    -F, --format <format>\n");
+    fprintf(stderr, "       Specify the format of the input file. The possible values are:\n");
+    fprintf(stderr, "           multi     multi_code\n");
+    fprintf(stderr, "           planar    planar_code\n");
+    fprintf(stderr, "       In case this is not specified, the program assumes planar_code.\n");
 }
 
 void usage(char *name){
@@ -450,11 +453,12 @@ int processOptions(int argc, char **argv) {
         {"filter", required_argument, NULL, 'f'},
         {"detailed", no_argument, NULL, 'd'},
         {"verbose", no_argument, NULL, 'v'},
-        {"output", no_argument, NULL, 'o'}
+        {"output", no_argument, NULL, 'o'},
+        {"format", required_argument, NULL, 'F'}
     };
     int option_index = 0;
 
-    while ((c = getopt_long(argc, argv, "hf:dvo", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "hf:dvoF:", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
                 //handle long option with no alternative
@@ -480,6 +484,16 @@ int processOptions(int argc, char **argv) {
             case 'o':
                 outfile = stdout;
                 break;
+            case 'F':
+                if (strcmp(optarg, "multi") == 0) {
+                    readGraph = readMultiCode;
+                } else if (strcmp(optarg, "planar") == 0) {
+                    readGraph = readPlanarCode;
+                } else {
+                    fprintf(stderr, "Unknown file format: %s.\n", optarg);
+                    return EXIT_FAILURE;
+                }
+                break;
             case '?':
                 usage(name);
                 return EXIT_FAILURE;
@@ -497,12 +511,14 @@ int main(int argc, char *argv[]) {
     graph_t *gComplement;
 //    set_t s;
     
+    readGraph = readPlanarCode;
+    
     int po = processOptions(argc, argv);
     if(po != -1) return po;
     
     graphCount = 0;
     
-    while (readPlanarCode(stdin, &g)) {
+    while (readGraph(stdin, &g)) {
         graphCount++;
         
         //filtering
