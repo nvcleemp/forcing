@@ -44,16 +44,7 @@ boolean handleClique(set_t s,graph_t *g,clique_options *opt){
 }
 
 void processGraph(graph_t *g){
-    clique_options *opts;
-    opts=malloc(sizeof(clique_options));
-    opts->time_function=NULL;
-    opts->output=stderr;
-    opts->reorder_function=NULL;
-    opts->reorder_map=NULL;
-    opts->user_function=handleClique;
-    opts->user_data=NULL;
-    opts->clique_list=independentSets;
-    opts->clique_list_length=MAXIMUM_CLIQUE_COUNT;
+    clique_options opts = {NULL, NULL, NULL, stderr, handleClique, NULL, independentSets, MAXIMUM_CLIQUE_COUNT};
     
     core = set_new(g->n);
     anticore = set_new(g->n);
@@ -65,7 +56,7 @@ void processGraph(graph_t *g){
     independentSetCount = 0;
     forcingNumber = -1;
     
-    clique_find_all(g,0,0,TRUE,opts);
+    clique_find_all(g,0,0,TRUE,&opts);
     
     independentSetCounts = increment(independentSetCounts, independentSetCount);
     
