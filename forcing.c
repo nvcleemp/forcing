@@ -366,7 +366,7 @@ boolean readMultiCode(FILE *f, graph_t **g){
         int order = c;
         *g = graph_new(order);
         zeroCounter = 0;
-        while (zeroCounter < order) {
+        while (zeroCounter < order - 1) {
             int neighbour = (unsigned short) getc(f);
             if (neighbour == 0) {
                 zeroCounter++;
