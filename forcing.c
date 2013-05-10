@@ -117,6 +117,7 @@ int forcingNumberForIndependentSet(int setNr, int upperBound, int n){
         set_free(complement);
     }
     if(set_size(setAntiCore)>0){
+        set_free(setAntiCore);
         return 1;
     }
     set_free(setAntiCore);
