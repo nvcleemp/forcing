@@ -76,7 +76,12 @@ void processGraph(graph_t *g){
             int f = forcingNumberForIndependentSet(i, upperBound, g->n);
             if(f!=-1 && (forcingNumber==-1 || f < forcingNumber)){
                 forcingNumber = f;
-                upperBound = f; //f is at most upperBound
+                
+                upperBound = f-1;
+                /* We have already found a forcing set of size f,
+                 * so we only need to see if we can find one that is smaller.
+                 */
+                
                 if(forcingNumber == lowerBound){
                     break;
                 }
