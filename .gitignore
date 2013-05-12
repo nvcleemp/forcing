@@ -1,13 +1,9 @@
 #NetBeans project folder
 nbproject/
 
-#Executable file
-forcing
-
-#source distributions
-forcing-sources.tar.gz
-forcing-sources.zip
-
+# build files
+/build/
+/dist/
 
 #Cliquer file
 cliquer.c

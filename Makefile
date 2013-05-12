@@ -14,7 +14,7 @@ SHELL = /bin/sh
 CC32 = gcc 
 CC64 = gcc 
 CFLAGS = -O4 -Wall
-COMPLETE = forcing forcing-64 forcing-profile forcing-debug
+COMPLETE = build/forcing build/forcing-64 build/forcing-profile build/forcing-debug
 SOURCES = forcing.c freqtable.c Makefile COPYRIGHT.txt LICENSE.txt
 FORCING_SOURCES = forcing.c cliquer.c graph.c reorder.c freqtable.c
 
@@ -22,33 +22,40 @@ all : 32bit
 
 complete: $(COMPLETE)
 
-32bit: forcing
+32bit: build/forcing
 
-64bit : forcing-64
+64bit : build/forcing-64
 
-profile : forcing-profile
+profile : build/forcing-profile
 
-debug : forcing-debug
+debug : build/forcing-debug
 
-forcing: $(FORCING_SOURCES)
-	${CC32} $(CFLAGS) $(FORCING_SOURCES) -o forcing
+build/forcing: $(FORCING_SOURCES)
+	mkdir -p build
+	${CC32} $(CFLAGS) $(FORCING_SOURCES) -o build/forcing
 
-forcing-64: $(FORCING_SOURCES)
-	${CC64} $(CFLAGS) $(FORCING_SOURCES) -o forcing-64
+build/forcing-64: $(FORCING_SOURCES)
+	mkdir -p build
+	${CC64} $(CFLAGS) $(FORCING_SOURCES) -o build/forcing-64
 
-forcing-profile: $(FORCING_SOURCES)
-	${CC32} -Wall -pg -g $(FORCING_SOURCES) -o forcing-profile
+build/forcing-profile: $(FORCING_SOURCES)
+	mkdir -p build
+	${CC32} -Wall -pg -g $(FORCING_SOURCES) -o build/forcing-profile
 
-forcing-debug: $(FORCING_SOURCES)
-	${CC32} -Wall -rdynamic -g $(FORCING_SOURCES) -o forcing-debug
+build/forcing-debug: $(FORCING_SOURCES)
+	mkdir -p build
+	${CC32} -Wall -rdynamic -g $(FORCING_SOURCES) -o build/forcing-debug
 
-sources: forcing-sources.zip forcing-sources.tar.gz
+sources: dist/forcing-sources.zip dist/forcing-sources.tar.gz
 
-forcing-sources.zip: $(SOURCES)
-	zip forcing-sources $(SOURCES)
+dist/forcing-sources.zip: $(SOURCES)
+	mkdir -p dist
+	zip dist/forcing-sources $(SOURCES)
 
-forcing-sources.tar.gz: $(SOURCES)
-	tar czf forcing-sources.tar.gz $(SOURCES)
+dist/forcing-sources.tar.gz: $(SOURCES)
+	mkdir -p dist
+	tar czf dist/forcing-sources.tar.gz $(SOURCES)
 
 clean:
-	rm -f $(COMPLETE)
+	rm -rf build
+	rm -rf dist
