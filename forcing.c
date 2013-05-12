@@ -17,8 +17,27 @@
 //===================================================================
 
 boolean isCurrentGraphSelected(graph_t *g){
-    //currently no graphs are selected
-    return FALSE;
+    if (selectForcingEqualAlpha && forcingNumber != alpha) return FALSE;
+    
+    if (selectForcingEqual >= 0 && selectForcingEqual != forcingNumber) return FALSE;
+    if (selectForcingLess >= 0 && selectForcingLess <= forcingNumber) return FALSE;
+    if (selectForcingGreater >= 0 && selectForcingGreater >= forcingNumber) return FALSE;
+    
+    if (selectAlphaEqual >= 0 && selectAlphaEqual != alpha) return FALSE;
+    if (selectAlphaLess >= 0 && selectAlphaLess <= alpha) return FALSE;
+    if (selectAlphaGreater >= 0 && selectAlphaGreater >= alpha) return FALSE;
+    
+    if (selectSizeCoreEqual >= 0 && selectSizeCoreEqual != set_size(core)) return FALSE;
+    if (selectSizeCoreLess >= 0 && selectSizeCoreLess <= set_size(core)) return FALSE;
+    if (selectSizeCoreGreater >= 0 && selectSizeCoreGreater >= set_size(core)) return FALSE;
+    
+    if (selectSizeAntiCoreEqual >= 0 && selectSizeAntiCoreEqual != g->n - set_size(anticore)) return FALSE;
+    if (selectSizeAntiCoreLess >= 0 && selectSizeAntiCoreLess <= g->n - set_size(anticore)) return FALSE;
+    if (selectSizeAntiCoreGreater >= 0 && selectSizeAntiCoreGreater >= g->n - set_size(anticore)) return FALSE;
+    
+    selectedCount++;
+    
+    return TRUE;
 }
 
 //===================================================================
@@ -652,6 +671,95 @@ void usage(char *name){
     fprintf(stderr, "For more information type: %s -h \n\n", name);
 }
 
+void parseSelectString(char *selectString) {
+    if (strlen(selectString)<=2){
+        //all select specifiers are at least 3 characters long
+        fprintf(stderr, "select specifier to short (%s) -- ignoring\n", selectString);
+        return;
+    } else if (strcmp(selectString, "f=a") == 0 || strcmp(selectString, "a=f") == 0) {
+        fprintf(stderr, "Selecting graphs that have forcing number = alpha.\n");
+        selectForcingEqualAlpha = TRUE;
+    } else if (selectString[0] == 'f') {
+        //forcing number
+        if (selectString[1] == '=') {
+            selectForcingEqual = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have forcing number = %d.\n", selectForcingEqual);
+        } else if (selectString[1] == '<') {
+            selectForcingLess = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have forcing number < %d.\n", selectForcingLess);
+        } else if (selectString[1] == '>') {
+            selectForcingGreater = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have forcing number > %d.\n", selectForcingGreater);
+        } else {
+            fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+            return;
+        }
+    } else if (selectString[0] == 'a') {
+        //alpha
+        if (selectString[1] == '=') {
+            selectAlphaEqual = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have alpha = %d.\n", selectAlphaEqual);
+        } else if (selectString[1] == '<') {
+            selectAlphaLess = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have alpha < %d.\n", selectAlphaLess);
+        } else if (selectString[1] == '>') {
+            selectAlphaGreater = atoi(selectString+2);
+            fprintf(stderr, "Selecting graphs that have alpha > %d.\n", selectAlphaGreater);
+        } else {
+            fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+            return;
+        }
+    } else if (strlen(selectString)==3){
+        //all following select specifiers are at least 4 characters long
+        fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+        return;
+    } else if (selectString[0] == 's' && selectString[1] == 'c') {
+        //size of core
+        if (selectString[2] == '=') {
+            selectSizeCoreEqual = atoi(selectString+3);
+            fprintf(stderr, "Selecting graphs that have a core with %d element%s.\n",
+                    selectSizeCoreEqual, selectSizeCoreEqual == 1 ? "" : "s");
+        } else if (selectString[2] == '<') {
+            selectSizeCoreLess = atoi(selectString+3);
+            fprintf(stderr, "Selecting graphs that have a core with less than %d element%s.\n",
+                    selectSizeCoreLess, selectSizeCoreLess == 1 ? "" : "s");
+        } else if (selectString[2] == '>') {
+            selectSizeCoreGreater = atoi(selectString+3);
+            fprintf(stderr, "Selecting graphs that have a core with more than %d element%s.\n",
+                    selectSizeCoreGreater, selectSizeCoreGreater == 1 ? "" : "s");
+        } else {
+            fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+            return;
+        }
+    } else if (strlen(selectString)==4){
+        //all following select specifiers are at least 5 characters long
+        fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+        return;
+    } else if (selectString[0] == 's' && selectString[1] == 'a' && selectString[2] == 'c') {
+        //size of anti-core
+        if (selectString[3] == '=') {
+            selectSizeAntiCoreEqual = atoi(selectString+4);
+            fprintf(stderr, "Selecting graphs that have a anti-core with %d element%s.\n",
+                    selectSizeAntiCoreEqual, selectSizeAntiCoreEqual == 1 ? "" : "s");
+        } else if (selectString[3] == '<') {
+            selectSizeAntiCoreLess = atoi(selectString+4);
+            fprintf(stderr, "Selecting graphs that have a anti-core with less than %d element%s.\n",
+                    selectSizeAntiCoreLess, selectSizeAntiCoreLess == 1 ? "" : "s");
+        } else if (selectString[3] == '>') {
+            selectSizeAntiCoreGreater = atoi(selectString+4);
+            fprintf(stderr, "Selecting graphs that have a anti-core with more than %d element%s.\n",
+                    selectSizeAntiCoreGreater, selectSizeAntiCoreGreater == 1 ? "" : "s");
+        } else {
+            fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+            return;
+        }
+    } else {
+        fprintf(stderr, "invalid select specifier (%s) -- ignoring\n", selectString);
+        return;
+    }
+    withSelect = TRUE;
+}
+
 /*
  * process any command-line options.
  */
@@ -660,6 +768,7 @@ int processOptions(int argc, char **argv) {
     char *name = argv[0];
     static struct option long_options[] = {
         {"sage", required_argument, NULL, 0},
+        {"select", required_argument, NULL, 0},
         {"help", no_argument, NULL, 'h'},
         {"filter", required_argument, NULL, 'f'},
         {"detailed", no_argument, NULL, 'd'},
@@ -677,6 +786,9 @@ int processOptions(int argc, char **argv) {
                     case 0:
                         toSage = TRUE;
                         sageFile = fopen(optarg, "w");
+                        break;
+                    case 1:
+                        parseSelectString(optarg);
                         break;
                     default:
                         fprintf(stderr, "Illegal option index %d.\n", option_index);
@@ -773,6 +885,11 @@ int main(int argc, char *argv[]) {
     printFrequencyTable(forcingNumberCount, format);
     
     fprintf(stderr, "Read %d graphs.\n", graphCount);
+    
+    if (withSelect) {
+        fprintf(stderr, "Selected %d graph%s.\n",
+                selectedCount, selectedCount == 1 ? "" : "s");
+    }
 
     return 0;
 }

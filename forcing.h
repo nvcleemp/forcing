@@ -44,6 +44,28 @@ boolean (*readGraph) (FILE *f, graph_t **g);
 boolean toSage = FALSE;
 FILE *sageFile = NULL;
 
+boolean withSelect = FALSE;
+
+boolean selectForcingEqualAlpha = FALSE;
+
+int selectForcingEqual = -1;
+int selectForcingGreater = -1;
+int selectForcingLess = -1;
+
+int selectAlphaEqual = -1;
+int selectAlphaGreater = -1;
+int selectAlphaLess = -1;
+
+int selectSizeCoreEqual = -1;
+int selectSizeCoreGreater = -1;
+int selectSizeCoreLess = -1;
+
+int selectSizeAntiCoreEqual = -1;
+int selectSizeAntiCoreGreater = -1;
+int selectSizeAntiCoreLess = -1;
+
+int selectedCount = 0;
+
 // Variables which store data for a single graph
 
 set_t core;
@@ -87,6 +109,8 @@ boolean readGraph6(FILE *f, graph_t **g);
 void help(char *name);
 
 void usage(char *name);
+
+void parseSelectString(char *selectString);
 
 boolean processOptions(int argc, char **argv);
 
