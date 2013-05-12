@@ -13,6 +13,15 @@
 #include "set.h"
 
 //===================================================================
+// Miscellaneous methods
+//===================================================================
+
+boolean isCurrentGraphSelected(graph_t *g){
+    //currently no graphs are selected
+    return FALSE;
+}
+
+//===================================================================
 // Forcing independence methods
 //===================================================================
 
@@ -96,6 +105,11 @@ void processGraph(graph_t *g, graph_t *originalG){
     }
     
     forcingNumberCount = increment(forcingNumberCount, forcingNumber);
+    
+    if (isCurrentGraphSelected(g)) {
+        if(toSage)
+            printCurrentGraphToSageFile(originalG, sageFile);
+    }
     
     set_free(core);
     set_free(anticore);
@@ -645,6 +659,7 @@ int processOptions(int argc, char **argv) {
     int c;
     char *name = argv[0];
     static struct option long_options[] = {
+        {"sage", required_argument, NULL, 0},
         {"help", no_argument, NULL, 'h'},
         {"filter", required_argument, NULL, 'f'},
         {"detailed", no_argument, NULL, 'd'},
@@ -659,6 +674,10 @@ int processOptions(int argc, char **argv) {
             case 0:
                 //handle long option with no alternative
                 switch(option_index) {
+                    case 0:
+                        toSage = TRUE;
+                        sageFile = fopen(optarg, "w");
+                        break;
                     default:
                         fprintf(stderr, "Illegal option index %d.\n", option_index);
                         usage(name);
@@ -716,6 +735,10 @@ int main(int argc, char *argv[]) {
     
     graphCount = 0;
     
+    if (toSage) {
+        printHeadSageFile(sageFile);
+    }
+    
     while (readGraph(stdin, &g)) {
         graphCount++;
         
@@ -731,6 +754,11 @@ int main(int argc, char *argv[]) {
         
         graph_free(g);
         graph_free(gComplement);
+    }
+    
+    if (toSage) {
+        printTailSageFile(sageFile);
+        fclose(sageFile);
     }
     
     char *format = "%5d : %6d\n";

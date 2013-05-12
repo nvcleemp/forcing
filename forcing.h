@@ -41,6 +41,9 @@ FILE *outfile = NULL;
 
 boolean (*readGraph) (FILE *f, graph_t **g);
 
+boolean toSage = FALSE;
+FILE *sageFile = NULL;
+
 // Variables which store data for a single graph
 
 set_t core;
@@ -54,6 +57,8 @@ int forcingNumber;
 set_t temporarySet; // used by forcingNumberForIndependentSet
 
 // Methods
+
+boolean isCurrentGraphSelected(graph_t *g);
 
 boolean handleClique(set_t s, graph_t *g, clique_options *opt);
 
