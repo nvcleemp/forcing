@@ -234,10 +234,128 @@ graph_t *getComplement(graph_t *g){
 }
 
 //===================================================================
-// Printing methods
+// Output methods
 //===================================================================
 
+void printGraphAsPythonDict(graph_t *g, FILE *f){
+    //for use in Sage
     
+    int i, j;
+    
+    fprintf(f, "d = {");
+    
+    for (i = 0; i < g->n; i++) {
+        fprintf(f, "%d: [", i);
+        boolean first = TRUE;
+        for (j = 0; j < g->n; j++) {
+            if(GRAPH_IS_EDGE(g, i, j)){
+                if (first) {
+                    fprintf(f, "%d", j);
+                    first = FALSE;
+                } else {
+                    fprintf(f, ", %d", j);
+                }
+            }
+        }
+        fprintf(f, "]");
+        if (i < g->n-1) {
+            fprintf(f, ", ");
+        }
+    }
+    fprintf(f, "}\n");
+}
+
+void printCurrentGraphToSageFile(graph_t *g, FILE *f){
+    int i;
+    
+    printGraphAsPythonDict(g, f);
+    fprintf(f, "g = Graph(d)\n");
+    
+    fprintf(f, "sets = '''");
+    for (i = 0; i < independentSetCount; i++) {
+        int vertex = set_return_next(independentSets[i],-1);
+        fprintf(f, "{\\\\small\\\\{%d", vertex);
+        while ((vertex=set_return_next(independentSets[i],vertex))>=0) {
+            fprintf(f, ", %d", vertex);
+        }
+        fprintf(f, "\\\\}\\\\\\\\}\n");
+    }
+    fprintf(f, "'''\n");
+    
+    fprintf(f, "core = '");
+    if (set_size(core)) {
+        int vertex = set_return_next(core,-1);
+        fprintf(f, "{\\\\small\\\\{%d", vertex);
+        while ((vertex=set_return_next(core,vertex))>=0) {
+            fprintf(f, ", %d", vertex);
+        }
+        fprintf(f, "\\\\}}");
+    } else {
+        fprintf(f, "$\\\\emptyset$");
+    }
+    fprintf(f, "'\n");
+    
+    set_t realAnticore = getSetComplement(anticore);
+    fprintf(f, "anticore = '");
+    if (set_size(realAnticore)) {
+        int vertex = set_return_next(realAnticore,-1);
+        fprintf(f, "{\\\\small\\\\{%d", vertex);
+        while ((vertex=set_return_next(realAnticore,vertex))>=0) {
+            fprintf(f, ", %d", vertex);
+        }
+        fprintf(f, "\\\\}}");
+    } else {
+        fprintf(f, "$\\\\emptyset$");
+    }
+    fprintf(f, "'\n");
+    set_free(realAnticore);
+    
+    fprintf(f, "snippets.append(graphToLaTeXSnippet(g, %d, %d, sets, core, anticore))\n\n",
+            alpha, forcingNumber);
+}
+
+void printHeadSageFile(FILE *f){
+    fprintf(f, "def buildLaTeXFile(mainPart):\n");
+    fprintf(f, "    start = '''\\\\documentclass[10pt]{article}\n\n");
+    fprintf(f, "\\\\usepackage{tikz}\n\\\\usepackage{tkz-berge}\n\n");
+    fprintf(f, "\\\\begin{document}\n");
+    fprintf(f, "'''\n");
+    fprintf(f, "    end = '''\\\\end{document}\\n'''\n");
+    fprintf(f, "    return start + mainPart + end\n\n");
+    fprintf(f, "def graphToLaTeXSnippet(g, alpha, f, sets, core, anticore):\n");
+    fprintf(f, "    from string import Template\n");
+    fprintf(f, "    template = Template('''\\\\section*{$name}\n");
+    fprintf(f, "$picture\n\\\\bigskip\n\n");
+    fprintf(f, "\\\\noindent$$\\\\alpha$$: $alpha\\\\\\\\\n");
+    fprintf(f, "Forcing number: $f\\\\\\\\\n");
+    fprintf(f, "Independent sets:\\\\\\\\\n");
+    fprintf(f, "$sets\\\\\\\\\n");
+    fprintf(f, "Core: $core\\\\\\\\\n");
+    fprintf(f, "Anti-core: $anticore\\\\\\\\\n''')\n");
+    fprintf(f, "    content = template.substitute(name=latexEscape(g.graph6_string()),\n");
+    fprintf(f, "                                  picture=latex(g), alpha=alpha, f=f,\n");
+    fprintf(f, "                                  sets=sets, core=core, anticore=anticore)\n");
+    fprintf(f, "    return content\n\n");
+    fprintf(f, "def latexEscape(s):\n");
+    fprintf(f, "    s = s.replace('\\\\', r'\\textbackslash ')\n");
+    fprintf(f, "    escape_chars = {'#': r'\\#','$': r'\\$','%%': r'\\%%','&': r'\\&',\n");
+    fprintf(f, "                    '_': r'\\_','{': r'\\{','}': r'\\}','^': r'\\textasciicircum ',\n");
+    fprintf(f, "                    '~': r'\\textasciitilde '}\n");
+    fprintf(f, "    for old, new in escape_chars.iteritems(): s = s.replace(old, new)\n");
+    fprintf(f, "    s = s.replace('`', r'\\`{}')\n");
+    fprintf(f, "    return s\n\n");
+    fprintf(f, "snippets = []\n\n");
+}
+
+void printTailSageFile(FILE *f){
+    fprintf(f, "content = buildLaTeXFile('\\\\clearpage\\n'.join(snippets))\n");
+    fprintf(f, "try:\n");
+    fprintf(f, "    latex_file = open('output/forcing.tex', 'w')\n");
+    fprintf(f, "    latex_file.write(content)\n");
+    fprintf(f, "    latex_file.close()\n");
+    fprintf(f, "except:\n");
+    fprintf(f, "    print 'Creating LaTeX failed. \n");
+}
 //===================================================================
 // Input methods
 //===================================================================

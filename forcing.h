@@ -69,6 +69,10 @@ set_t getSetComplement(set_t s);
 
 graph_t *getComplement(graph_t *g);
 
+void printGraphAsPythonDict(graph_t *g, FILE *f);
+
+void printCurrentGraphToSageFile(graph_t *g, FILE *f);
+
 boolean readPlanarCode(FILE *f, graph_t **g);
 
 boolean readMultiCode(FILE *f, graph_t **g);
