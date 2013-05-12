@@ -57,7 +57,7 @@ set_t temporarySet; // used by forcingNumberForIndependentSet
 
 boolean handleClique(set_t s, graph_t *g, clique_options *opt);
 
-void processGraph(graph_t *g);
+void processGraph(graph_t *g, graph_t *originalG);
 
 int forcingNumberForIndependentSet(int setNr, int upperBound, int n);
 

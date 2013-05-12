@@ -43,7 +43,7 @@ boolean handleClique(set_t s,graph_t *g,clique_options *opt){
     return TRUE;
 }
 
-void processGraph(graph_t *g){
+void processGraph(graph_t *g, graph_t *originalG){
     clique_options opts = {reorder_by_unweighted_greedy_coloring, NULL, NULL, stderr, handleClique, NULL, independentSets, MAXIMUM_CLIQUE_COUNT};
     
     core = set_new(g->n);
@@ -237,7 +237,7 @@ graph_t *getComplement(graph_t *g){
 // Printing methods
 //===================================================================
 
-
+    
 //===================================================================
 // Input methods
 //===================================================================
@@ -609,7 +609,7 @@ int main(int argc, char *argv[]) {
         
         if(detailed) graph_print(g);
         
-        processGraph(gComplement);
+        processGraph(gComplement, g);
         
         graph_free(g);
         graph_free(gComplement);
