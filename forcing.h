@@ -44,6 +44,9 @@ boolean (*readGraph) (FILE *f, graph_t **g);
 boolean toSage = FALSE;
 FILE *sageFile = NULL;
 
+boolean toSagenb = FALSE;
+FILE *sagenbFile = NULL;
+
 boolean withSelect = FALSE;
 
 boolean selectForcingEqualAlpha = FALSE;
@@ -97,6 +100,8 @@ set_t getSetComplement(set_t s);
 graph_t *getComplement(graph_t *g);
 
 void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName);
+
+void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f);
 
 void printCurrentGraphToSageFile(graph_t *g, FILE *f);
 

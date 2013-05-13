@@ -128,6 +128,8 @@ void processGraph(graph_t *g, graph_t *originalG){
     if (isCurrentGraphSelected(g)) {
         if(toSage)
             printCurrentGraphToSageFile(originalG, sageFile);
+        if(toSagenb)
+            printCurrentGraphToSageWorksheetFile(originalG, sagenbFile);
     }
     
     set_free(core);
@@ -296,6 +298,35 @@ void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName){
         }
     }
     fprintf(f, "}\n");
+}
+
+int sageWorksheetFileNextNumber = 1;
+
+void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f) {
+    int result;
+    
+    //create variable names
+    char dictName[20];
+    result = snprintf(dictName, 20, "d%d", sageWorksheetFileNextNumber);
+    if (result < 0 || result >= 20){
+        fprintf(stderr, "error while creating Sage worksheet -- skipping graph %d\n", sageWorksheetFileNextNumber);
+        return;
+    }
+    char graphName[20];
+    result = snprintf(graphName, 20, "g%d", sageWorksheetFileNextNumber);
+    if (result < 0 || result >= 20){
+        fprintf(stderr, "error while creating Sage worksheet -- skipping graph %d\n", sageWorksheetFileNextNumber);
+        return;
+    }
+    
+    //write graph to cell
+    fprintf(f, "{{{id%d|\n", sageWorksheetFileNextNumber);
+    printGraphAsPythonDict(g, f, dictName);
+    fprintf(f, "%s = Graph(%s)\n", graphName, dictName);
+    fprintf(f, "%s.plot()\n", graphName);
+    fprintf(f, "///\n}}}\n\n");
+    
+    sageWorksheetFileNextNumber++;
 }
 
 void printCurrentGraphToSageFile(graph_t *g, FILE *f){
@@ -768,6 +799,7 @@ int processOptions(int argc, char **argv) {
     char *name = argv[0];
     static struct option long_options[] = {
         {"sage", required_argument, NULL, 0},
+        {"sagenb", required_argument, NULL, 0},
         {"select", required_argument, NULL, 0},
         {"help", no_argument, NULL, 'h'},
         {"filter", required_argument, NULL, 'f'},
@@ -788,6 +820,10 @@ int processOptions(int argc, char **argv) {
                         sageFile = fopen(optarg, "w");
                         break;
                     case 1:
+                        toSagenb = TRUE;
+                        sagenbFile = fopen(optarg, "w");
+                        break;
+                    case 2:
                         parseSelectString(optarg);
                         break;
                     default:
@@ -871,6 +907,9 @@ int main(int argc, char *argv[]) {
     if (toSage) {
         printTailSageFile(sageFile);
         fclose(sageFile);
+    }
+    if (toSagenb) {
+        fclose(sagenbFile);
     }
     
     char *format = "%5d : %6d\n";
