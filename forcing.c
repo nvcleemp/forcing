@@ -272,12 +272,12 @@ graph_t *getComplement(graph_t *g){
 // Output methods
 //===================================================================
 
-void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName){
+void printGraphAsPythonDict(graph_t *g, FILE *f){
     //for use in Sage
     
     int i, j;
     
-    fprintf(f, "%s = {", varName);
+    fprintf(f, "{");
     
     for (i = 0; i < g->n; i++) {
         fprintf(f, "%d: [", i);
@@ -303,27 +303,13 @@ void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName){
 int sageWorksheetFileNextNumber = 1;
 
 void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f) {
-    int result;
-    
-    //create variable names
-    char dictName[20];
-    result = snprintf(dictName, 20, "d%d", sageWorksheetFileNextNumber);
-    if (result < 0 || result >= 20){
-        fprintf(stderr, "error while creating Sage worksheet -- skipping graph %d\n", sageWorksheetFileNextNumber);
-        return;
-    }
-    char graphName[20];
-    result = snprintf(graphName, 20, "g%d", sageWorksheetFileNextNumber);
-    if (result < 0 || result >= 20){
-        fprintf(stderr, "error while creating Sage worksheet -- skipping graph %d\n", sageWorksheetFileNextNumber);
-        return;
-    }
     
     //write graph to cell
     fprintf(f, "{{{id%d|\n", sageWorksheetFileNextNumber);
-    printGraphAsPythonDict(g, f, dictName);
-    fprintf(f, "%s = Graph(%s)\n", graphName, dictName);
-    fprintf(f, "%s.plot()\n", graphName);
+    fprintf(f, "d%d = ", sageWorksheetFileNextNumber);
+    printGraphAsPythonDict(g, f);
+    fprintf(f, "g%d = Graph(d%d)\n", sageWorksheetFileNextNumber, sageWorksheetFileNextNumber);
+    fprintf(f, "g%d.plot()\n", sageWorksheetFileNextNumber);
     fprintf(f, "///\n}}}\n\n");
     
     sageWorksheetFileNextNumber++;
@@ -332,7 +318,8 @@ void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f) {
 void printCurrentGraphToSageFile(graph_t *g, FILE *f){
     int i;
     
-    printGraphAsPythonDict(g, f, "d");
+    fprintf(f, "d = ");
+    printGraphAsPythonDict(g, f);
     fprintf(f, "g = Graph(d)\n");
     
     fprintf(f, "sets = '''");

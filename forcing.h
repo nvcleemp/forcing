@@ -99,7 +99,7 @@ set_t getSetComplement(set_t s);
 
 graph_t *getComplement(graph_t *g);
 
-void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName);
+void printGraphAsPythonDict(graph_t *g, FILE *f);
 
 void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f);
 
