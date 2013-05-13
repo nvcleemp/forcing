@@ -300,6 +300,21 @@ void printGraphAsPythonDict(graph_t *g, FILE *f){
     fprintf(f, "}\n");
 }
 
+void printSetAsPythonList(set_t s, FILE *f){
+    //for use in Sage
+    
+    if (set_size(s)) {
+        int el = set_return_next(s,-1);
+        fprintf(f, "[%d", el);
+        while ((el=set_return_next(s,el))>=0) {
+            fprintf(f, ", %d", el);
+        }
+        fprintf(f, "]\n");
+    } else {
+        fprintf(f, "[]\n");
+    }
+}
+
 int sageWorksheetFileNextNumber = 1;
 
 void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f) {
@@ -308,8 +323,25 @@ void printCurrentGraphToSageWorksheetFile(graph_t *g, FILE *f) {
     fprintf(f, "{{{id%d|\n", sageWorksheetFileNextNumber);
     fprintf(f, "d%d = ", sageWorksheetFileNextNumber);
     printGraphAsPythonDict(g, f);
-    fprintf(f, "g%d = Graph(d%d)\n", sageWorksheetFileNextNumber, sageWorksheetFileNextNumber);
-    fprintf(f, "g%d.plot()\n", sageWorksheetFileNextNumber);
+    
+    fprintf(f, "core%d = ", sageWorksheetFileNextNumber);
+    printSetAsPythonList(core, f);
+    
+    fprintf(f, "anticore%d = ", sageWorksheetFileNextNumber);
+    set_t realAnticore = getSetComplement(anticore);
+    printSetAsPythonList(realAnticore, f);
+    
+    fprintf(f, "remaining%d = ", sageWorksheetFileNextNumber);
+    set_t fixedVertices = set_union(NULL, core, realAnticore);
+    set_t remainingVertices = getSetComplement(fixedVertices);
+    printSetAsPythonList(remainingVertices, f);
+    set_free(realAnticore);
+    set_free(fixedVertices);
+    set_free(remainingVertices);
+    
+    fprintf(f, "colours%1$d = {'#ff9999': anticore%1$d, '#99ff99': core%1$d, '#9999ff': remaining%1$d}\n", sageWorksheetFileNextNumber);
+    fprintf(f, "g%1$d = Graph(d%1$d)\n", sageWorksheetFileNextNumber);
+    fprintf(f, "g%1$d.plot(vertex_colors=colours%1$d)\n", sageWorksheetFileNextNumber);
     fprintf(f, "///\n}}}\n\n");
     
     sageWorksheetFileNextNumber++;
