@@ -270,12 +270,12 @@ graph_t *getComplement(graph_t *g){
 // Output methods
 //===================================================================
 
-void printGraphAsPythonDict(graph_t *g, FILE *f){
+void printGraphAsPythonDict(graph_t *g, FILE *f, char *varName){
     //for use in Sage
     
     int i, j;
     
-    fprintf(f, "d = {");
+    fprintf(f, "%s = {", varName);
     
     for (i = 0; i < g->n; i++) {
         fprintf(f, "%d: [", i);
@@ -301,7 +301,7 @@ void printGraphAsPythonDict(graph_t *g, FILE *f){
 void printCurrentGraphToSageFile(graph_t *g, FILE *f){
     int i;
     
-    printGraphAsPythonDict(g, f);
+    printGraphAsPythonDict(g, f, "d");
     fprintf(f, "g = Graph(d)\n");
     
     fprintf(f, "sets = '''");
